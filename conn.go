@@ -38,7 +38,7 @@ func (m *Mock) Prepare(query string) (driver.Stmt, error) {
 
 	if !nextStmt.re.MatchString(query) {
 		return nil, fmt.Errorf("dbmoc: unexpected query: got %s, want %s",
-			nextStmt.MatchPattern, query)
+			query, nextStmt.MatchPattern)
 	}
 
 	if got := calledInTx(); got != nextStmt.InTx {

@@ -2,6 +2,7 @@ package dbmoc
 
 import (
 	"database/sql/driver"
+	"fmt"
 	"io"
 	"reflect"
 )
@@ -14,7 +15,9 @@ type Rows struct {
 	// number of cols.
 	Data [][]interface{}
 
-	readIndex int
+	// index advances after each row we successfully scan. It keeps track of
+	// what row we're on.
+	index int
 }
 
 // Columns returns the row columns. This is called internally by database/sql.
@@ -26,15 +29,19 @@ func (r *Rows) Columns() []string {
 // database/sql.
 func (r *Rows) Next(dest []driver.Value) error {
 	rs := r.Data
-	if len(rs) == r.readIndex {
+	if len(rs) == r.index {
 		return io.EOF
 	}
 
-	for i := range rs[r.readIndex] {
-		dest[i] = rs[r.readIndex][i]
+	if got, want := len(dest), len(rs[r.index]); got != want {
+		return fmt.Errorf("failed to set row data: column mismatch, got %d, want %d", got, want)
 	}
 
-	r.readIndex++
+	for i := range rs[r.index] {
+		dest[i] = rs[r.index][i]
+	}
+
+	r.index++
 	return nil
 }
 

@@ -38,7 +38,7 @@ func (m *Mock) Prepare(query string) (driver.Stmt, error) {
 
 	if !nextStmt.re.MatchString(query) {
 		return nil, fmt.Errorf("dbmoc: unexpected query: got %s, want %s",
-			query, nextStmt.MatchPattern)
+			query, nextStmt.MatchQuery)
 	}
 
 	if got := calledInTx(); got != nextStmt.InTx {
@@ -72,13 +72,13 @@ func (m *Mock) Driver() driver.Driver {
 	return &mockDriver{}
 }
 
-// SetStatements takes in statements and checks if they have valid
-// MatchPatterns. The order of the statements matter. If a SQL statement is
-// seen out of order, you'll get an error. After a statement is seen, it's
-// removed from the internal queue.
+// SetStatements takes in statements and checks if they have valid MatchQuery
+// patterns. The order of the statements matter. If a SQL statement is seen out
+// of order, you'll get an error. After a statement is seen, it's removed from
+// the internal queue.
 func (m *Mock) SetStatements(stmts []Statement) error {
 	for i := 0; i < len(stmts); i++ {
-		re, err := regexp.Compile(stmts[i].MatchPattern)
+		re, err := regexp.Compile(stmts[i].MatchQuery)
 		if err != nil {
 			return err
 		}

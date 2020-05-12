@@ -42,7 +42,7 @@ func TestDriverQuery(t *testing.T) {
 		defer db.Close()
 
 		err := mock.SetStatements([]Statement{
-			{MatchPattern: `select 1`,
+			{MatchQuery: `select 1`,
 				Rows: &Rows{
 					Cols: []string{"?column?"},
 					Data: [][]interface{}{
@@ -77,7 +77,7 @@ func TestDriverQuery(t *testing.T) {
 		defer db.Close()
 
 		err := mock.SetStatements([]Statement{
-			{MatchPattern: "select id, name from user",
+			{MatchQuery: "select id, name from user",
 				Rows: &Rows{
 					Cols: []string{"id", "name"},
 					Data: [][]interface{}{
@@ -131,7 +131,7 @@ func TestDriverQuery(t *testing.T) {
 		defer db.Close()
 
 		err := mock.SetStatements([]Statement{
-			{MatchPattern: "select .*? from user", MatchArgs: []interface{}{int64(2)},
+			{MatchQuery: "select .*? from user", MatchArgs: []interface{}{int64(2)},
 				Rows: &Rows{
 					Cols: []string{"id"},
 					Data: [][]interface{}{
@@ -177,7 +177,7 @@ func TestDriverExec(t *testing.T) {
 		defer db.Close()
 
 		err := mock.SetStatements([]Statement{
-			{MatchPattern: "insert into [a-z]+ values",
+			{MatchQuery: "insert into [a-z]+ values",
 				MatchArgs: []interface{}{int64(1), "foo"},
 				Result: &Result{
 					LastID:   3,

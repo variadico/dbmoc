@@ -10,9 +10,9 @@ import (
 // Statement holds information for expected database statements. They're used
 // to validate expected and actual queries.
 type Statement struct {
-	// Pattern is a Go regexp pattern. This will be used to match against a
+	// MatchQuery is a Go regexp pattern. This will be used to match against a
 	// query, so you know it showed up.
-	MatchPattern string
+	MatchQuery string
 	// Args are used to verify that the correct arguments got passed to your
 	// query. These are checked for equality with the actual arguments that
 	// your function passes in.

@@ -9,18 +9,19 @@ func ExampleMock_query() {
 	mock := New()
 	db := sql.OpenDB(mock)
 
+	rows := []struct {
+		ID   int64  `db:"id"`
+		Name string `db:"name"`
+	}{
+		{ID: 1, Name: "fizz"},
+		{ID: 2, Name: "buzz"},
+	}
 	wantStmts := []Statement{
 		{
-			MatchPattern: `^select .*\s+from foo.bar`,
+			MatchQuery: `^select .*\s+from foo.bar`,
 			MatchArgs:    []interface{}{3},
 
-			Rows: &Rows{
-				Cols: []string{"id", "name"},
-				Data: RowData{
-					{1, "fizz"},
-					{2, "buzz"},
-				},
-			},
+			Rows: NewRows(rows),
 		},
 	}
 	if err := mock.SetStatements(wantStmts); err != nil {
@@ -36,13 +37,13 @@ func ExampleMock_exec() {
 	db := sql.OpenDB(mock)
 
 	wantStmts := []Statement{
-		{MatchPattern: "^select pg_advisory_lock"},
-		{MatchPattern: "^create schema if not exists foo"},
+		{MatchQuery: "^select pg_advisory_lock"},
+		{MatchQuery: "^create schema if not exists foo"},
 
-		{MatchPattern: "^create table foo.bar", InTx: true},
-		{MatchPattern: "^insert into foo.bar", InTx: true, SkipMatchArgs: true},
+		{MatchQuery: "^create table foo.bar", InTx: true},
+		{MatchQuery: "^insert into foo.bar", InTx: true, SkipMatchArgs: true},
 
-		{MatchPattern: "^select pg_advisory_unlock"},
+		{MatchQuery: "^select pg_advisory_unlock"},
 	}
 	if err := mock.SetStatements(wantStmts); err != nil {
 		log.Fatalln(err)

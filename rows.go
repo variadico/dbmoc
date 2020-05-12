@@ -53,13 +53,19 @@ func (r *Rows) Close() error {
 // NewRows converts a slice of structs into database rows. The columns names
 // are taken from fields that have the `db:"col"` struct tag.
 func NewRows(structSlice interface{}) *Rows {
+	return NewRowsTag("db", structSlice)
+}
+
+// NewRowsTag is like NewRows, but the column names are taken from a custom
+// struct tag.
+func NewRowsTag(tag string, structSlice interface{}) *Rows {
 	ss := reflect.ValueOf(structSlice)
 	if !isStructSlice(ss) {
 		return nil
 	}
 
 	return &Rows{
-		Cols: dbTags(ss),
+		Cols: dbTags(tag, ss),
 		Data: sliceValues(ss),
 	}
 }
@@ -77,14 +83,14 @@ func isStruct(v reflect.Type) bool {
 	return k == reflect.Struct
 }
 
-func dbTags(slice reflect.Value) []string {
+func dbTags(tag string, slice reflect.Value) []string {
 	sv := slice.Index(0)
 	st := makeValue(slice.Type().Elem()).Type()
 
 	var tags []string
 	for i := 0; i < sv.NumField(); i++ {
 		f := st.Field(i)
-		if v, ok := f.Tag.Lookup("db"); ok {
+		if v, ok := f.Tag.Lookup(tag); ok {
 			tags = append(tags, v)
 		}
 	}

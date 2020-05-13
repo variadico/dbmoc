@@ -88,6 +88,10 @@ func (m *Mock) SetStatements(stmts []Statement) error {
 			// Avoids panic, Scan will return sql.ErrNoRows
 			stmts[i].Rows = new(Rows)
 		}
+		if stmts[i].Result == nil {
+			// Avoids panic, scanning will error.
+			stmts[i].Result = new(Result)
+		}
 	}
 
 	m.stmts = stmts
